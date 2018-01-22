@@ -521,6 +521,11 @@ macro ExpandProcEN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
         InsBufLine(hbuf, ln, "@szLine1@/* END:   Modified by @szMyName@, @sz@/@sz1@/@sz3@ */");
         return
     }
+	else if (szCmd == "kmod")
+	{
+        DelBufLine(hbuf, ln)
+        CreateKmodDef(hbuf,szMyName,1)		
+	}
     else
     {
         SearchForward()
@@ -1581,7 +1586,7 @@ macro InsertFileHeaderEN(hbuf, ln,szName,szContent)
     GetFunctionList(hbuf,hnewbuf)
     InsBufLine(hbuf, ln + 0,  "/******************************************************************************")
     InsBufLine(hbuf, ln + 1,  "")
-    InsBufLine(hbuf, ln + 2,  "  Copyright (C), 2016-2020, JimTech Co., Ltd.")
+    InsBufLine(hbuf, ln + 2,  "  Copyright (C), 2016-2020, Baicells Co., Ltd.")
     InsBufLine(hbuf, ln + 3,  "")
     InsBufLine(hbuf, ln + 4,  " ******************************************************************************")
     sz = GetFileName(GetBufName (hbuf))
@@ -2766,6 +2771,63 @@ macro CreateFunctionDef(hbuf, szName, language)
     }
 }
 
+macro CreateKmodDef(hbuf, szName, language)
+{
+    hnewbuf = newbuf("")
+    if(hnewbuf == hNil)
+    {
+        stop
+    }
+
+    if(language == 0 )
+    {
+        szModName = Ask("«Î ‰»Îƒ£øÈ√˚≥∆:")
+    }
+    else
+    {
+        szModName = Ask("Please input module name")
+    }
+
+	ln = 0
+    InsBufLine(hbuf, ln + 0,  "/*")
+    InsBufLine(hbuf, ln + 1,  " * Source code for Module @szModName@")
+    InsBufLine(hbuf, ln + 2,  " *")
+    InsBufLine(hbuf, ln + 3,  " * Copyright (C) 2018 Baicells Corporation")
+    InsBufLine(hbuf, ln + 4,  " *")
+    InsBufLine(hbuf, ln + 5,  " */")
+    InsBufLine(hbuf, ln + 6,  "")
+     
+    InsBufLine(hbuf, ln + 7,  "#include <linux/init.h>")
+    InsBufLine(hbuf, ln + 8,  "#include <linux/module.h>")
+    InsBufLine(hbuf, ln + 9,  "")
+    InsBufLine(hbuf, ln + 10, "")
+
+	InsBufLine(hbuf, ln + 11, "static int __init @szModName@_init(void)")
+	InsBufLine(hbuf, ln + 12, "{")
+	InsBufLine(hbuf, ln + 13, "    return 0;")
+	InsBufLine(hbuf, ln + 14, "}")
+	InsBufLine(hbuf, ln + 15, "subsys_initcall(@szModName@_init);")
+	InsBufLine(hbuf, ln + 16, "")
+
+	InsBufLine(hbuf, ln + 17, "static void __exit @szModName@_exit(void)")
+	InsBufLine(hbuf, ln + 18, "{")
+	InsBufLine(hbuf, ln + 19, "    return;")
+	InsBufLine(hbuf, ln + 20, "}")
+	InsBufLine(hbuf, ln + 21, "module_exit(@szModName@_exit);")
+	InsBufLine(hbuf, ln + 22, "")
+
+    szMyName = getreg(MYNAME)
+    if(strlen( szMyName ) == 0)
+    {
+        szMyName = Ask("Enter your name:")
+        setreg(MYNAME, szMyName)
+    }
+    
+	InsBufLine(hbuf, ln + 23, "MODULE_AUTHOR(\"@szMyName@(Baicells)\");")
+	InsBufLine(hbuf, ln + 24, "MODULE_DESCRIPTION(\"description for @szModName@\");")
+	InsBufLine(hbuf, ln + 25, "MODULE_LICENSE(\"GPL\");")
+	InsBufLine(hbuf, ln + 26, "MODULE_ALIAS(\"platform:@szModName@\");")
+}
 
 macro GetLeftWord(szLine,ichRight)
 {
